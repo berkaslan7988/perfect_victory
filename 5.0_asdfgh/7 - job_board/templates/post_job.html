@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Post a New Job - JobBoard</title>
+</head>
+<body style="background-color: #f4f6f9; margin: 0; font-family: Arial, sans-serif;">
+
+    <nav class="navbar" style="background:#232f3e; padding: 15px 30px; display:flex; justify-content:space-between; align-items:center; color:white;">
+        <h2 style="margin:0;"><a href="/" style="color:white; text-decoration:none;">JobBoard</a></h2>
+        <div>
+            <a href="/" style="color:white; text-decoration:none;">Back to Jobs</a>
+        </div>
+    </nav>
+
+    <div class="auth-container" style="max-width: 550px; margin: 40px auto;">
+        <h2>Post a New Job</h2>
+        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 20px;">Fill out the details below to find your next great hire.</p>
+        
+        <form method="POST">
+            <label style="display:block; text-align:left; margin-bottom:5px;">Job Title</label>
+            <input type="text" name="title" placeholder="e.g. Full Stack Developer" required>
+
+            <label style="display:block; text-align:left; margin-bottom:5px; margin-top:15px;">Company Name</label>
+            <input type="text" name="company" placeholder="e.g. Tech Industries" required>
+
+            <label style="display:block; text-align:left; margin-bottom:5px; margin-top:15px;">Location</label>
+            <input type="text" name="location" placeholder="e.g. Remote / Istanbul, TR" required>
+
+            <label style="display:block; text-align:left; margin-bottom:5px; margin-top:15px;">Job Description</label>
+            <textarea name="description" rows="6" placeholder="Describe the responsibilities, skills, and requirements..." style="width:100%; padding:12px; border-radius:6px; border:none; box-sizing:border-box; margin-bottom:20px; font-family: Arial, sans-serif;" required></textarea>
+
+            <button type="submit" class="btn-auth">Publish Job</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Home - JobBoard</title>
+</head>
+<body style="background-color: #f4f6f9; margin: 0; font-family: Arial, sans-serif;">
+
+    <nav class="navbar" style="background:#232f3e; padding: 15px 30px; display:flex; justify-content:space-between; align-items:center; color:white;">
+        <h2 style="margin:0;"><a href="/" style="color:white; text-decoration:none;">JobBoard</a></h2>
+        <div class="navbar-links">
+            <a href="/" style="color:white; margin-left:20px; text-decoration:none;">Find Jobs</a>
+            
+            {% if 'user_id' in session %}
+                <span style="color:#ff9900; margin-left:20px;">Welcome, {{ session['username'] }} ({{ session['role'] }})</span>
+                {% if session['role'] == 'employer' %}
+                      <a href="/dashboard" style="color:white; margin-left:20px; text-decoration:none;">Dashboard</a>
+                     <a href="/post-job" style="color:#ff9900; margin-left:20px; text-decoration:none; font-weight:bold;">+ Post a Job</a>
+                {% endif %}
+                <a href="/logout" style="color:white; margin-left:20px; text-decoration:none;">Logout</a>
+            {% else %}
+                <a href="/login" style="color:white; margin-left:20px; text-decoration:none;">Login</a>
+                <a href="/register" style="color:white; margin-left:20px; text-decoration:none;">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-text">
+            <h1>Discover Your Next Career Move</h1>
+            <p style="color:#666;">Explore high-paying tech jobs posted by top companies</p>
+        </div>
+
+        {% for job in jobs %}
+        <div class="job-card">
+            <div class="job-details">
+                <h3>{{ job.title }}</h3>
+                <div class="job-meta">
+                    <span style="font-weight:bold; color:#232f3e;">🏢 {{ job.company }}</span>
+                    <span>📍 {{ job.location }}</span>
+                </div>
+                <p class="job-desc">{{ job.description }}</p>
+            </div>
+            
+            <div class="job-action">
+                {% if session.get('role') == 'seeker' %}
+                    <a href="/apply/{{ job.id }}" class="btn-apply">Apply Now</a>
+                {% elif session.get('role') == 'employer' %}
+                    <span class="btn-disabled">Employer Mode</span>
+                {% else %}
+                    <a href="/login" class="btn-apply">Login to Apply</a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align:center; color:#999;">No job postings available at the moment.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberDashboard | Security Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#0a0e1a;--bg-secondary:#1a1a2e;--bg-tertiary:#0d1526;
+  --card-bg:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.08);
+  --accent:#00d4ff;--success:#00ff88;--warning:#ff9f43;--danger:#ff6b6b;--critical:#ff3838;
+  --text-primary:#e2e8f0;--text-secondary:#8892b0;
+  --terminal-bg:#0a0f1a;
+  --glass-blur:20px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-secondary) 50%,var(--bg-tertiary) 100%);
+  color:var(--text-primary);min-height:100vh;
+  overflow-x:hidden;
+  background-attachment:fixed;
+}
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:3px}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.25);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,212,255,0.45)}
+
+/* ─── Animations ─── */
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.5;transform:scale(1.3)}
+}
+@keyframes glow{
+  0%,100%{box-shadow:0 0 5px rgba(0,212,255,0.2),0 0 20px rgba(0,212,255,0.05)}
+  50%{box-shadow:0 0 15px rgba(0,212,255,0.4),0 0 40px rgba(0,212,255,0.15)}
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes borderGlow{
+  0%,100%{border-color:rgba(0,212,255,0.15)}
+  50%{border-color:rgba(0,212,255,0.5)}
+}
+@keyframes scanline{
+  0%{background-position:0 0}
+  100%{background-position:0 100%}
+}
+@keyframes countUp{
+  from{opacity:0;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes toastIn{
+  from{transform:translateX(120%);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
+@keyframes toastOut{
+  from{transform:translateX(0);opacity:1}
+  to{transform:translateX(120%);opacity:0}
+}
+@keyframes bgShift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+@keyframes shimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+
+/* ─── App Container ─── */
+.app{
+  max-width:1400px;margin:0 auto;padding:0 24px 48px;
+}
+
+/* ─── BG Noise Overlay ─── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+  opacity:.5;
+}
+.app{position:relative;z-index:1}
+
+/* ─── Header ─── */
+header{
+  display:flex;align-items:center;gap:20px;
+  padding:20px 0;flex-wrap:wrap;
+  animation:slideUp .6s ease;
+}
+.logo{
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+}
+.logo-icon{font-size:28px;filter:drop-shadow(0 0 8px rgba(0,212,255,.4))}
+.logo-text{
+  font-size:22px;font-weight:800;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--accent),#7b68ee,var(--accent));
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:bgShift 4s ease infinite;
+}
+.header-controls{
+  display:flex;align-items:center;gap:12px;
+  flex:1;justify-content:flex-end;flex-wrap:wrap;
+}
+.target-input-wrap{
+  position:relative;flex:1;max-width:380px;min-width:200px;
+}
+.target-input{
+  width:100%;padding:12px 16px 12px 42px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--card-border);border-radius:12px;
+  color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;
+  transition:all .3s ease;outline:none;
+}
+.target-input::placeholder{color:var(--text-secondary);opacity:.6}
+.target-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,212,255,0.1),0 0 20px rgba(0,212,255,0.05);
+  background:rgba(255,255,255,0.06);
+}
+.input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--text-secondary);font-size:16px;pointer-events:none;
+}
+.scan-all-btn{
+  padding:12px 28px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:1px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),#7b68ee);
+  box-shadow:0 4px 15px rgba(0,212,255,0.25);
+  transition:all .3s ease;display:flex;align-items:center;gap:8px;
+  text-transform:uppercase;
+}
+.scan-all-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 25px rgba(0,212,255,0.4);
+}
+.scan-all-btn:active{transform:translateY(0)}
+.scan-all-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.connection-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--danger);flex-shrink:0;
+  transition:background .3s ease;
+  box-shadow:0 0 8px rgba(255,107,107,0.5);
+}
+.connection-dot.connected{
+  background:var(--success);
+  box-shadow:0 0 8px rgba(0,255,136,0.5);
+}
+
+/* ─── Modules Grid ─── */
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text-secondary);margin:32px 0 16px;display:flex;align-items:center;gap:10px;
+}
+.section-label::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--card-border),transparent);
+}
+.modules-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+}
+
+/* ─── Module Card ─── */
+.module-card{
+  background:var(--card-bg);
+  backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--card-border);border-radius:16px;
+  padding:24px;position:relative;overflow:hidden;
+  transition:all .3s ease;
+  animation:slideUp .6s ease both;
+}
+.module-card:nth-child(1){animation-delay:.05s}
+.module-card:nth-child(2){animation-delay:.1s}
+.module-card:nth-child(3){animation-delay:.15s}
+.module-card:nth-child(4){animation-delay:.2s}
+.module-card:nth-child(5){animation-delay:.25s}
+.module-card:nth-child(6){animation-delay:.3s}
+.module-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,212,255,0.02) 0%,transparent 50%);
+  pointer-events:none;
+}
+.module-card:hover{
+  transform:scale(1.02);
+  border-color:rgba(255,255,255,0.15);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.module-card.scanning{
+  animation:glow 2s ease infinite,slideUp .6s ease both;
+  border-color:rgba(0,212,255,0.25);
+}
+.module-card.complete{border-color:rgba(0,255,136,0.2)}
+.module-card.error{border-color:rgba(255,107,107,0.2)}
+
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-icon{font-size:32px;filter:drop-shadow(0 0 6px rgba(0,212,255,.2))}
+.card-status{display:flex;align-items:center;gap:6px}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--success);transition:all .3s ease;
+}
+.status-dot.scanning{
+  background:var(--accent);animation:pulse 1.5s ease infinite;
+}
+.status-dot.complete{background:var(--success)}
+.status-dot.error{background:var(--danger)}
+.status-label{font-size:11px;color:var(--text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:1px}
+
+.card-title{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text-primary)}
+.card-desc{font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:16px}
+
+/* Progress */
+.progress-wrap{
+  height:3px;background:rgba(255,255,255,0.05);border-radius:2px;
+  margin-bottom:16px;overflow:hidden;opacity:0;transition:opacity .3s ease;
+}
+.progress-wrap.active{opacity:1}
+.progress-bar{
+  height:100%;width:0;border-radius:2px;
+  background:linear-gradient(90deg,var(--accent),#7b68ee);
+  transition:width .4s ease;position:relative;
+}
+.progress-bar::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;
+}
+
+/* Card Stats */
+.card-stats{
+  padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;
+  margin-bottom:16px;min-height:42px;
+  display:flex;align-items:center;
+  font-size:13px;font-weight:500;color:var(--text-secondary);
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  transition:all .3s ease;
+}
+.card-stats .stat-value{animation:countUp .3s ease}
+.stat-highlight{color:var(--accent)}
+.stat-success{color:var(--success)}
+.stat-danger{color:var(--danger)}
+.stat-warning{color:var(--warning)}
+
+/* Card Button */
+.card-btn{
+  width:100%;padding:10px;border:1px solid rgba(0,212,255,0.2);
+  border-radius:10px;background:rgba(0,212,255,0.05);
+  color:var(--accent);font-family:'Inter',sans-serif;font-size:13px;
+  font-weight:600;cursor:pointer;transition:all .3s ease;
+  text-transform:uppercase;letter-spacing:1px;
+}
+.card-btn:hover{
+  background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.4);
+  box-shadow:0 0 15px rgba(0,212,255,0.1);
+}
+.card-btn:disabled{opacity:.4;cursor:not-allowed}
+.card-btn.scanning-btn{
+  border-color:rgba(255,159,67,0.3);background:rgba(255,159,67,0.05);color:var(--warning);
+}
+.card-tooltip{
+  font-size:10px;color:var(--text-secondary);margin-top:8px;text-align:center;
+  font-style:italic;opacity:.7;
+}
+
+/* ─── Results Section ─── */
+.results{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  margin-top:8px;
+  animation:slideUp .6s ease .35s both;
+}
+.panel{
+  background:var(--card-bg);
+  backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--card-border);border-radius:16px;
+  overflow:hidden;
+}
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--card-border);
+}
+.panel-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.panel-action-btn{
+  padding:6px 14px;border:1px solid var(--card-border);border-radius:8px;
+  background:transparent;color:var(--text-secondary);font-size:11px;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all .3s ease;
+  font-weight:500;
+}
+.panel-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── Terminal ─── */
+.terminal-body{
+  background:var(--terminal-bg);padding:16px;
+  max-height:420px;overflow-y:auto;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-size:12px;line-height:1.8;
+  position:relative;
+}
+.terminal-body::before{
+  content:'';position:sticky;top:0;left:0;right:0;display:block;
+  height:20px;margin-top:-16px;margin-bottom:-4px;
+  background:linear-gradient(var(--terminal-bg),transparent);
+  pointer-events:none;z-index:1;
+}
+.terminal-line{animation:fadeIn .2s ease}
+.terminal-line .ts{color:rgba(255,255,255,0.2);margin-right:8px}
+.terminal-line .mod{font-weight:700;margin-right:8px}
+.terminal-line .msg{}
+.terminal-line.info .mod{color:var(--accent)}
+.terminal-line.info .msg{color:var(--text-secondary)}
+.terminal-line.success .mod{color:var(--success)}
+.terminal-line.success .msg{color:var(--success)}
+.terminal-line.warning .mod{color:var(--warning)}
+.terminal-line.warning .msg{color:var(--warning)}
+.terminal-line.danger .mod{color:var(--danger)}
+.terminal-line.danger .msg{color:var(--danger)}
+.terminal-empty{
+  color:var(--text-secondary);opacity:.4;text-align:center;padding:60px 20px;
+  font-size:13px;
+}
+
+/* ─── Charts ─── */
+.charts-body{padding:20px;min-height:420px;display:flex;flex-direction:column;gap:20px}
+.chart-container{flex:1;position:relative;min-height:180px}
+.chart-container canvas{width:100%!important}
+.chart-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--text-secondary);opacity:.35;text-align:center;padding:40px 20px;
+  gap:12px;height:100%;
+}
+.chart-placeholder-icon{font-size:40px}
+.chart-placeholder-text{font-size:13px}
+.chart-label{
+  font-size:11px;font-weight:600;color:var(--text-secondary);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;
+}
+
+/* ─── Toast Notifications ─── */
+.toast-container{
+  position:fixed;top:24px;right:24px;z-index:9999;
+  display:flex;flex-direction:column;gap:10px;
+}
+.toast{
+  padding:14px 20px;border-radius:12px;
+  background:rgba(20,20,40,0.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--card-border);
+  font-size:13px;font-weight:500;
+  animation:toastIn .4s ease;
+  max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  display:flex;align-items:center;gap:10px;
+}
+.toast.removing{animation:toastOut .3s ease forwards}
+.toast-icon{font-size:16px;flex-shrink:0}
+.toast.error{border-color:rgba(255,107,107,0.3);color:var(--danger)}
+.toast.success{border-color:rgba(0,255,136,0.3);color:var(--success)}
+.toast.info{border-color:rgba(0,212,255,0.3);color:var(--accent)}
+.toast.warning{border-color:rgba(255,159,67,0.3);color:var(--warning)}
+
+/* ─── Responsive ─── */
+@media(max-width:1024px){
+  .modules-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .results{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .app{padding:0 12px 32px}
+  header{padding:16px 0}
+  .logo-text{font-size:16px;letter-spacing:2px}
+  .header-controls{width:100%}
+  .target-input-wrap{max-width:100%}
+  .modules-grid{grid-template-columns:1fr}
+  .scan-all-btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">CYBERDASHBOARD</span>
+    </div>
+    <div class="header-controls">
+      <div class="target-input-wrap">
+        <span class="input-icon">🎯</span>
+        <input type="text" class="target-input" id="targetInput" placeholder="Target IP or hostname (e.g. 192.168.1.1)" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="scan-all-btn" id="scanAllBtn" onclick="scanAll()">
+        <span>⚡</span> SCAN ALL
+      </button>
+      <div class="connection-dot" id="connDot" title="Disconnected"></div>
+    </div>
+  </header>
+
+  <!-- Module Cards -->
+  <div class="section-label">Security Modules</div>
+  <section class="modules-grid" id="modulesGrid">
+
+    <!-- Port Scanner -->
+    <article class="module-card" id="card-port_scanner" data-module="port_scanner">
+      <div class="card-header">
+        <span class="card-icon">🔍</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-port_scanner"></div>
+          <span class="status-label" id="label-port_scanner">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Port Scanner</h3>
+      <p class="card-desc">Discovers open ports and services on the target host using TCP SYN scanning.</p>
+      <div class="progress-wrap" id="progress-port_scanner"><div class="progress-bar" id="bar-port_scanner"></div></div>
+      <div class="card-stats" id="stats-port_scanner">Awaiting scan…</div>
+      <button class="card-btn" id="btn-port_scanner" onclick="startScan('port_scanner')">Start Scan</button>
+    </article>
+
+    <!-- Banner Grabber -->
+    <article class="module-card" id="card-banner_grabber" data-module="banner_grabber">
+      <div class="card-header">
+        <span class="card-icon">📡</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-banner_grabber"></div>
+          <span class="status-label" id="label-banner_grabber">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Banner Grabber</h3>
+      <p class="card-desc">Collects service banners to identify software versions and potential attack vectors.</p>
+      <div class="progress-wrap" id="progress-banner_grabber"><div class="progress-bar" id="bar-banner_grabber"></div></div>
+      <div class="card-stats" id="stats-banner_grabber">Awaiting scan…</div>
+      <button class="card-btn" id="btn-banner_grabber" onclick="startScan('banner_grabber')">Start Scan</button>
+    </article>
+
+    <!-- Directory Auditor -->
+    <article class="module-card" id="card-dir_auditor" data-module="dir_auditor">
+      <div class="card-header">
+        <span class="card-icon">📂</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-dir_auditor"></div>
+          <span class="status-label" id="label-dir_auditor">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Directory Auditor</h3>
+      <p class="card-desc">Brute-forces web directories and files to discover hidden endpoints and resources.</p>
+      <div class="progress-wrap" id="progress-dir_auditor"><div class="progress-bar" id="bar-dir_auditor"></div></div>
+      <div class="card-stats" id="stats-dir_auditor">Awaiting scan…</div>
+      <button class="card-btn" id="btn-dir_auditor" onclick="startScan('dir_auditor')">Start Scan</button>
+    </article>
+
+    <!-- Process Monitor -->
+    <article class="module-card" id="card-process_monitor" data-module="process_monitor">
+      <div class="card-header">
+        <span class="card-icon">⚙️</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-process_monitor"></div>
+          <span class="status-label" id="label-process_monitor">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Process Monitor</h3>
+      <p class="card-desc">Monitors running processes, CPU and memory usage on the local system in real-time.</p>
+      <div class="progress-wrap" id="progress-process_monitor"><div class="progress-bar" id="bar-process_monitor"></div></div>
+      <div class="card-stats" id="stats-process_monitor">Awaiting scan…</div>
+      <button class="card-btn" id="btn-process_monitor" onclick="startScan('process_monitor')">Start Scan</button>
+    </article>
+
+    <!-- Vulnerability Scanner -->
+    <article class="module-card" id="card-vuln_scanner" data-module="vuln_scanner">
+      <div class="card-header">
+        <span class="card-icon">🛡️</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-vuln_scanner"></div>
+          <span class="status-label" id="label-vuln_scanner">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Vulnerability Scanner</h3>
+      <p class="card-desc">Identifies known CVEs and security weaknesses against service fingerprints.</p>
+      <div class="progress-wrap" id="progress-vuln_scanner"><div class="progress-bar" id="bar-vuln_scanner"></div></div>
+      <div class="card-stats" id="stats-vuln_scanner">Awaiting scan…</div>
+      <button class="card-btn" id="btn-vuln_scanner" onclick="startScan('vuln_scanner')">Start Scan</button>
+    </article>
+
+    <!-- Packet Sniffer -->
+    <article class="module-card" id="card-packet_sniffer" data-module="packet_sniffer">
+      <div class="card-header">
+        <span class="card-icon">📶</span>
+        <div class="card-status">
+          <div class="status-dot" id="dot-packet_sniffer"></div>
+          <span class="status-label" id="label-packet_sniffer">Ready</span>
+        </div>
+      </div>
+      <h3 class="card-title">Packet Sniffer</h3>
+      <p class="card-desc">Captures and analyzes live network traffic to detect anomalies and intrusions.</p>
+      <div class="progress-wrap" id="progress-packet_sniffer"><div class="progress-bar" id="bar-packet_sniffer"></div></div>
+      <div class="card-stats" id="stats-packet_sniffer">Awaiting scan…</div>
+      <button class="card-btn" id="btn-packet_sniffer" onclick="startScan('packet_sniffer')">Start Scan</button>
+      <p class="card-tooltip">⚠️ Requires administrator / root privileges</p>
+    </article>
+
+  </section>
+
+  <!-- Results -->
+  <div class="section-label">Live Results</div>
+  <section class="results">
+
+    <!-- Terminal Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🖥️ Terminal Output</span>
+        <button class="panel-action-btn" id="clearTermBtn" onclick="clearTerminal()">Clear</button>
+      </div>
+      <div class="terminal-body" id="terminal">
+        <div class="terminal-empty" id="terminalPlaceholder">Scan output will appear here…</div>
+      </div>
+    </div>
+
+    <!-- Charts Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📊 Visualizations</span>
+      </div>
+      <div class="charts-body" id="chartsBody">
+        <div id="portChartWrap" class="chart-container" style="display:none">
+          <div class="chart-label">Port Scan Results</div>
+          <canvas id="portChart"></canvas>
+        </div>
+        <div id="processChartWrap" class="chart-container" style="display:none">
+          <div class="chart-label">Process Memory Usage</div>
+          <canvas id="processChart"></canvas>
+        </div>
+        <div class="chart-placeholder" id="chartPlaceholder">
+          <span class="chart-placeholder-icon">📊</span>
+          <span class="chart-placeholder-text">Charts will render after scan completion</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CyberDashboard — Frontend Logic
+   ═══════════════════════════════════════════════════════════════ */
+
+const WS_URL = 'ws://127.0.0.1:9000/ws';
+
+const MODULES = {
+  port_scanner:    { name: 'Port Scanner',          icon: '🔍' },
+  banner_grabber:  { name: 'Banner Grabber',        icon: '📡' },
+  dir_auditor:     { name: 'Directory Auditor',     icon: '📂' },
+  process_monitor: { name: 'Process Monitor',       icon: '⚙️' },
+  vuln_scanner:    { name: 'Vulnerability Scanner', icon: '🛡️' },
+  packet_sniffer:  { name: 'Packet Sniffer',        icon: '📶' },
+};
+
+/* ─── State ─── */
+let ws = null;
+let reconnectDelay = 1000;
+const MAX_RECONNECT = 30000;
+let moduleState = {};
+let portChartInstance = null;
+let processChartInstance = null;
+
+// Accumulated results for charts / stats
+let moduleResults = {};
+
+Object.keys(MODULES).forEach(id => {
+  moduleState[id] = 'ready'; // ready | scanning | complete | error
+  moduleResults[id] = { items: [], progress: 0 };
+});
+
+/* ─── DOM Refs ─── */
+const $id = id => document.getElementById(id);
+const terminal     = $id('terminal');
+const connDot      = $id('connDot');
+const targetInput  = $id('targetInput');
+const scanAllBtn   = $id('scanAllBtn');
+const chartPlaceholder = $id('chartPlaceholder');
+
+/* ─── WebSocket ─── */
+function connectWS() {
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    reconnectDelay = 1000;
+    connDot.classList.add('connected');
+    connDot.title = 'Connected';
+    addLog('system', 'WebSocket connected to backend', 'success');
+  };
+
+  ws.onmessage = (ev) => {
+    try {
+      const msg = JSON.parse(ev.data);
+      handleMessage(msg);
+    } catch (e) {
+      console.error('Bad WS message', e);
+    }
+  };
+
+  ws.onclose = () => {
+    connDot.classList.remove('connected');
+    connDot.title = 'Disconnected';
+    addLog('system', `Connection lost — retrying in ${(reconnectDelay/1000).toFixed(0)}s`, 'warning');
+    setTimeout(connectWS, reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT);
+  };
+
+  ws.onerror = () => {
+    ws.close();
+  };
+}
+
+function sendWS(obj) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    showToast('Not connected to server', 'error');
+    return false;
+  }
+  ws.send(JSON.stringify(obj));
+  return true;
+}
+
+/* ─── Scans ─── */
+function startScan(moduleId) {
+  const target = targetInput.value.trim();
+  if (moduleId !== 'process_monitor' && !target) {
+    showToast('Enter a target IP or hostname first', 'warning');
+    targetInput.focus();
+    return;
+  }
+  if (moduleState[moduleId] === 'scanning') return;
+
+  // Reset results for this module
+  moduleResults[moduleId] = { items: [], progress: 0 };
+
+  const payload = { action: 'scan', module: moduleId, target: target || 'localhost' };
+  if (sendWS(payload)) {
+    setModuleState(moduleId, 'scanning');
+    addLog(moduleId, `Scan initiated → ${target || 'localhost'}`, 'info');
+  }
+}
+
+function scanAll() {
+  const target = targetInput.value.trim();
+  if (!target) {
+    showToast('Enter a target IP or hostname first', 'warning');
+    targetInput.focus();
+    return;
+  }
+  // Reset all
+  Object.keys(MODULES).forEach(id => {
+    moduleResults[id] = { items: [], progress: 0 };
+  });
+
+  if (sendWS({ action: 'scan_all', target })) {
+    Object.keys(MODULES).forEach(id => setModuleState(id, 'scanning'));
+    addLog('system', `Full scan launched → ${target}`, 'info');
+  }
+}
+
+/* ─── Message Handler ─── */
+function handleMessage(msg) {
+  const { module: mod, type, data } = msg;
+  if (!mod || !MODULES[mod]) return;
+
+  switch (type) {
+    case 'status':
+      setModuleState(mod, 'scanning');
+      if (data && data.message) addLog(mod, data.message, 'info');
+      if (data && data.progress != null) updateProgress(mod, data.progress);
+      break;
+
+    case 'result':
+      moduleResults[mod].items.push(data);
+      handleResultLog(mod, data);
+      if (data && data.progress != null) updateProgress(mod, data.progress);
+      updateCardStats(mod);
+      break;
+
+    case 'complete':
+      setModuleState(mod, 'complete');
+      if (data) moduleResults[mod].summary = data;
+      updateProgress(mod, 100);
+      updateCardStats(mod);
+      addLog(mod, 'Scan complete', 'success');
+
+      // Update charts if applicable
+      if (mod === 'port_scanner')    updatePortChart(moduleResults[mod]);
+      if (mod === 'process_monitor') updateProcessChart(moduleResults[mod]);
+      break;
+
+    case 'error':
+      setModuleState(mod, 'error');
+      addLog(mod, (data && data.message) || 'Unknown error', 'danger');
+      break;
+  }
+}
+
+function handleResultLog(mod, data) {
+  if (!data) return;
+  const msg = data.message || data.text || JSON.stringify(data);
+
+  // Decide log type based on content heuristics
+  let logType = 'info';
+  const lower = msg.toLowerCase();
+  if (lower.includes('open') || lower.includes('found') || lower.includes('200'))
+    logType = 'success';
+  else if (lower.includes('vuln') || lower.includes('cve') || lower.includes('alert') || lower.includes('critical'))
+    logType = 'danger';
+  else if (lower.includes('warning') || lower.includes('timeout') || lower.includes('filtered'))
+    logType = 'warning';
+
+  addLog(mod, msg, logType);
+}
+
+/* ─── Card UI Helpers ─── */
+function setModuleState(moduleId, state) {
+  moduleState[moduleId] = state;
+  const card = $id(`card-${moduleId}`);
+  const dot  = $id(`dot-${moduleId}`);
+  const lbl  = $id(`label-${moduleId}`);
+  const btn  = $id(`btn-${moduleId}`);
+  const prog = $id(`progress-${moduleId}`);
+
+  card.classList.remove('scanning', 'complete', 'error');
+  dot.classList.remove('scanning', 'complete', 'error');
+  btn.classList.remove('scanning-btn');
+
+  if (state === 'scanning') {
+    card.classList.add('scanning');
+    dot.classList.add('scanning');
+    lbl.textContent = 'Scanning';
+    btn.textContent = 'Scanning…';
+    btn.disabled = true;
+    btn.classList.add('scanning-btn');
+    prog.classList.add('active');
+  } else if (state === 'complete') {
+    card.classList.add('complete');
+    dot.classList.add('complete');
+    lbl.textContent = 'Complete';
+    btn.textContent = 'Rescan';
+    btn.disabled = false;
+    setTimeout(() => prog.classList.remove('active'), 1200);
+  } else if (state === 'error') {
+    card.classList.add('error');
+    dot.classList.add('error');
+    lbl.textContent = 'Error';
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+    prog.classList.remove('active');
+  } else {
+    lbl.textContent = 'Ready';
+    btn.textContent = 'Start Scan';
+    btn.disabled = false;
+    prog.classList.remove('active');
+  }
+}
+
+function updateProgress(moduleId, pct) {
+  const bar = $id(`bar-${moduleId}`);
+  bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  moduleResults[moduleId].progress = pct;
+}
+
+function updateCardStats(moduleId) {
+  const stats = $id(`stats-${moduleId}`);
+  const res = moduleResults[moduleId];
+  const items = res.items;
+  const summary = res.summary || {};
+
+  switch (moduleId) {
+    case 'port_scanner': {
+      const open = items.filter(i => i.state === 'open' || (i.message && i.message.toLowerCase().includes('open'))).length;
+      const total = summary.total_scanned || items.length;
+      stats.innerHTML = `<span class="stat-success">${open} open</span>&nbsp;/&nbsp;<span class="stat-highlight">${total} scanned</span>`;
+      break;
+    }
+    case 'banner_grabber': {
+      const count = summary.banners_found != null ? summary.banners_found : items.length;
+      stats.innerHTML = `<span class="stat-highlight">${count}</span>&nbsp;banners found`;
+      break;
+    }
+    case 'dir_auditor': {
+      const count = summary.paths_found != null ? summary.paths_found : items.length;
+      stats.innerHTML = `<span class="stat-highlight">${count}</span>&nbsp;paths discovered`;
+      break;
+    }
+    case 'process_monitor': {
+      const cpu = summary.cpu_percent != null ? summary.cpu_percent : '—';
+      const ram = summary.ram_percent != null ? summary.ram_percent : '—';
+      stats.innerHTML = `CPU: <span class="stat-warning">${cpu}%</span>&nbsp;&nbsp;|&nbsp;&nbsp;RAM: <span class="stat-highlight">${ram}%</span>`;
+      break;
+    }
+    case 'vuln_scanner': {
+      const count = summary.vuln_count != null ? summary.vuln_count : items.length;
+      const cls = count > 0 ? 'stat-danger' : 'stat-success';
+      stats.innerHTML = `<span class="${cls}">${count}</span>&nbsp;vulnerabilit${count === 1 ? 'y' : 'ies'}`;
+      break;
+    }
+    case 'packet_sniffer': {
+      const pkts = summary.packet_count != null ? summary.packet_count : items.length;
+      const alerts = summary.alert_count != null ? summary.alert_count : 0;
+      stats.innerHTML = `<span class="stat-highlight">${pkts}</span>&nbsp;packets&nbsp;&nbsp;/&nbsp;&nbsp;<span class="${alerts > 0 ? 'stat-danger' : 'stat-success'}">${alerts}</span>&nbsp;alerts`;
+      break;
+    }
+    default:
+      stats.textContent = `${items.length} results`;
+  }
+}
+
+/* ─── Terminal ─── */
+function addLog(moduleId, message, type = 'info') {
+  const placeholder = $id('terminalPlaceholder');
+  if (placeholder) placeholder.remove();
+
+  const line = document.createElement('div');
+  line.className = `terminal-line ${type}`;
+  const now = new Date();
+  const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
+    .map(n => String(n).padStart(2, '0')).join(':');
+  const modLabel = moduleId === 'system' ? 'SYS' : (MODULES[moduleId] ? MODULES[moduleId].name.toUpperCase().replace(/ /g, '_') : moduleId.toUpperCase());
+  line.innerHTML = `<span class="ts">[${ts}]</span><span class="mod">[${modLabel}]</span><span class="msg">${escHtml(message)}</span>`;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function clearTerminal() {
+  terminal.innerHTML = '<div class="terminal-empty" id="terminalPlaceholder">Scan output will appear here…</div>';
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* ─── Charts ─── */
+const chartColors = {
+  cyan:    'rgba(0,212,255,0.85)',
+  green:   'rgba(0,255,136,0.85)',
+  red:     'rgba(255,107,107,0.85)',
+  orange:  'rgba(255,159,67,0.85)',
+  purple:  'rgba(123,104,238,0.85)',
+  pink:    'rgba(255,105,180,0.85)',
+  yellow:  'rgba(255,230,0,0.85)',
+};
+const chartBg = {
+  cyan:    'rgba(0,212,255,0.15)',
+  green:   'rgba(0,255,136,0.15)',
+  red:     'rgba(255,107,107,0.15)',
+  orange:  'rgba(255,159,67,0.15)',
+  purple:  'rgba(123,104,238,0.15)',
+  pink:    'rgba(255,105,180,0.15)',
+  yellow:  'rgba(255,230,0,0.15)',
+};
+const doughnutPalette = [chartColors.cyan, chartColors.green, chartColors.orange, chartColors.purple, chartColors.pink];
+const doughnutPaletteBg = [chartBg.cyan, chartBg.green, chartBg.orange, chartBg.purple, chartBg.pink];
+
+function hideChartPlaceholder() {
+  if (chartPlaceholder) chartPlaceholder.style.display = 'none';
+}
+
+function updatePortChart(res) {
+  hideChartPlaceholder();
+  const wrap = $id('portChartWrap');
+  wrap.style.display = 'block';
+
+  // Build data from items
+  const items = res.items || [];
+  const summary = res.summary || {};
+
+  // Try to extract port data
+  let labels = [];
+  let openData = [];
+  let closedData = [];
+
+  if (summary.ports && Array.isArray(summary.ports)) {
+    // If summary provides ports array
+    summary.ports.forEach(p => {
+      labels.push(`${p.port}/${p.protocol || 'tcp'}`);
+      openData.push(p.state === 'open' ? 1 : 0);
+      closedData.push(p.state === 'open' ? 0 : 1);
+    });
+  } else {
+    // Fallback: use items
+    items.forEach(item => {
+      const port = item.port || item.name || '?';
+      const protocol = item.protocol || 'tcp';
+      const state = item.state || (item.message && item.message.toLowerCase().includes('open') ? 'open' : 'closed');
+      labels.push(`${port}/${protocol}`);
+      openData.push(state === 'open' ? 1 : 0);
+      closedData.push(state === 'open' ? 0 : 1);
+    });
+  }
+
+  // Limit to 20 ports for readability
+  if (labels.length > 20) {
+    labels = labels.slice(0, 20);
+    openData = openData.slice(0, 20);
+    closedData = closedData.slice(0, 20);
+  }
+
+  if (portChartInstance) portChartInstance.destroy();
+
+  portChartInstance = new Chart($id('portChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Open',
+          data: openData,
+          backgroundColor: chartColors.green,
+          borderRadius: 4,
+          barThickness: 14,
+        },
+        {
+          label: 'Closed',
+          data: closedData,
+          backgroundColor: chartColors.red,
+          borderRadius: 4,
+          barThickness: 14,
+        },
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#8892b0', font: { family: 'Inter', size: 11 } } },
+      },
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8892b0', font: { family: 'Inter', size: 11 } } },
+        y: { stacked: true, grid: { display: false }, ticks: { color: '#e2e8f0', font: { family: "'JetBrains Mono','Fira Code',monospace", size: 11 } } },
+      }
+    }
+  });
+}
+
+function updateProcessChart(res) {
+  hideChartPlaceholder();
+  const wrap = $id('processChartWrap');
+  wrap.style.display = 'block';
+
+  const items = res.items || [];
+  const summary = res.summary || {};
+
+  let labels = [];
+  let data = [];
+
+  if (summary.top_processes && Array.isArray(summary.top_processes)) {
+    summary.top_processes.slice(0, 5).forEach(p => {
+      labels.push(p.name || 'unknown');
+      data.push(p.memory || p.mem || 0);
+    });
+  } else {
+    // Fallback: use items sorted by memory desc
+    const sorted = [...items].sort((a, b) => (b.memory || b.mem || 0) - (a.memory || a.mem || 0));
+    sorted.slice(0, 5).forEach(p => {
+      labels.push(p.name || p.process || 'unknown');
+      data.push(p.memory || p.mem || 0);
+    });
+  }
+
+  if (processChartInstance) processChartInstance.destroy();
+
+  processChartInstance = new Chart($id('processChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: doughnutPalette,
+        borderColor: doughnutPaletteBg,
+        borderWidth: 2,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#e2e8f0', font: { family: 'Inter', size: 11 }, padding: 12, usePointStyle: true, pointStyleWidth: 10 },
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,14,26,0.95)',
+          titleColor: '#e2e8f0',
+          bodyColor: '#8892b0',
+          borderColor: 'rgba(255,255,255,0.08)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed.toFixed(1)} MB`
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ─── Toasts ─── */
+function showToast(message, type = 'info') {
+  const container = $id('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { info: 'ℹ️', error: '❌', success: '✅', warning: '⚠️' };
+  toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${escHtml(message)}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    toast.addEventListener('animationend', () => toast.remove());
+  }, 3500);
+}
+
+/* ─── Events ─── */
+targetInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') scanAll();
+});
+
+/* ─── Init ─── */
+connectWS();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>{{ category.name }} - DevForum</title>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="brand">💬 DevForum</a>
+        <div>
+            <a href="/" style="color: white; text-decoration: none; margin-right: 15px;">🏠 Back to Home</a>
+            {% if 'user_id' in session %}
+                <span style="color: #fff;">👋 Hello, <strong>{{ session['username'] }}</strong></span>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 800px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div>
+                <h1 style="margin: 0; color: #1a237e;">{{ category.name }}</h1>
+                <p style="color: #666; margin: 5px 0 0 0;">{{ category.description }}</p>
+            </div>
+            <div>
+                {% if 'user_id' in session %}
+                    <a href="/category/{{ category.id }}/new-thread" style="background-color: #1a237e; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">+ New Thread</a>
+                {% else %}
+                    <a href="/login" style="background-color: #666; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9rem;">Login to Post</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="section-title">Discussions</h2>
+
+        {% for thread in threads %}
+        <div class="category-card" style="border-left: 4px solid #1a237e;">
+            <h3 style="margin: 0 0 8px 0;"><a href="/thread/{{ thread.id }}">{{ thread.title }}</a></h3>
+            <div style="font-size: 0.85rem; color: #777;">
+                Posted by <strong>@{{ thread.username }}</strong> on {{ thread.created_at[:16] }}
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; background: white; padding: 40px; border-radius: 8px; color: #999;">
+            No threads have been started in this category yet. Be the first to start one!
+        </div>
+        {% endfor %}
+
+    </div>
+
+</body>
+</html>

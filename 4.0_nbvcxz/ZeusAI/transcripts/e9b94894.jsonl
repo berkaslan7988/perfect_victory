@@ -1,0 +1,2 @@
+{"role": "user", "content": "proje tamamlanmış mı"}
+{"role": "assistant", "content": "Proje durumunu kontrol etmek için öncelikle `git_log` aracını kullanarak son commit geçmişine bakacağım. Bu, projede son yapılan değişiklikleri ve tamamlanma durumunu anlamamıza yardımcı olacaktır.\n\n```json\n[\n  {\n    \"name\": \"git_log\",\n    \"arguments\": {\n      \"n\": 5\n    }\n  }\n]\n```"}

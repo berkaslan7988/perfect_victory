@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostChat | Stealth Protocol</title>
+    <style>
+        /* NEON LIME THEME: #39FF14 */
+        body { font-family: 'Courier New', Courier, monospace; background-color: #000000; color: #39FF14; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; margin: 0; }
+        .container { width: 100%; max-width: 500px; background: #000000; padding: 25px; border-radius: 0; border: 3px solid #39FF14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        h2 { margin-top: 0; display: flex; align-items: center; gap: 10px; color: #39FF14; text-transform: uppercase; letter-spacing: 3px; font-weight: 900; }
+        
+        /* Inputs & Buttons */
+        input { width: 100%; padding: 14px; margin: 8px 0; background: #000000; color: #FFFFFF !important; border: 2px solid #39FF14; border-radius: 0; box-sizing: border-box; font-size: 18px; font-family: inherit; font-weight: bold; }
+        input::placeholder { color: #39FF14; opacity: 0.5; }
+
+        button { width: 100%; padding: 14px; margin: 8px 0; background: #000000; color: #39FF14; border: 2px solid #39FF14; border-radius: 0; box-sizing: border-box; font-size: 18px; font-family: inherit; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        button:hover { background: #39FF14; color: #000000; }
+        button:disabled { border-color: #1a440a; color: #1a440a; cursor: not-allowed; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tabs button { margin: 0; padding: 12px; flex: 1; border: 2px solid #39FF14; font-size: 14px; }
+        .tabs button.active { background: #39FF14; color: #000000; }
+
+        /* Chat UI */
+        #myIDLabel { color: #39FF14; font-weight: bold; margin-bottom: 15px; display: block; font-family: monospace; font-size: 1em; background: #000000; padding: 10px; border: 2px dashed #39FF14; text-align: center; }
+        #chatBox { height: 350px; overflow-y: scroll; border: 2px solid #39FF14; padding: 15px; background: #000000; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; scrollbar-color: #39FF14 #000000; }
+
+        /* MESSAGE STYLE: CONTENT WHITE, NAME GREEN */
+        .msg { padding: 10px 14px; border: 2px solid #39FF14; max-width: 85%; word-wrap: break-word; font-size: 16px; font-weight: bold; line-height: 1.4; color: #FFFFFF; }
+        .msg strong { color: #39FF14; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; }
+
+        .me { align-self: flex-end; background: rgba(255, 255, 255, 0.1); border-color: #FFFFFF; }
+        .them { align-self: flex-start; border-style: dashed; }
+        
+        /* GhostDrive UI */
+        #fileList { height: 410px; overflow-y: scroll; border: 2px solid #39FF14; padding: 10px; background: #000000; display: flex; flex-direction: column; gap: 10px; }
+        .file-item { padding: 15px; border: 2px solid #39FF14; display: flex; justify-content: space-between; align-items: center; }
+        .file-info { display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+        .file-name { font-weight: bold; font-size: 14px; color: #39FF14; }
+        .file-meta { font-size: 11px; color: #39FF14; opacity: 0.9; font-weight: bold; }
+        .file-action button { width: auto; padding: 8px 15px; font-size: 13px; margin: 0; border: 2px solid #39FF14; }
+
+        /* Progress Bar */
+        #fileProgress { display: none; margin-bottom: 10px; height: 5px; background: #003300; overflow: hidden; }
+        #progressBar { width: 0%; height: 100%; background: #39FF14; transition: width 0.3s; }
+
+        #loginError { color: #ff0000; font-size: 1em; margin-top: 10px; text-align: center; height: 25px; font-weight: bold; }
+
+        /* Viewer Overlay */
+        #viewerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
+        #viewerContent { width: 95%; max-height: 85%; border: 3px solid #39FF14; background: #000000; overflow: auto; padding: 15px; color: #FFFFFF; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        #viewerClose { margin-top: 20px; width: 150px; border: 3px solid #39FF14; font-size: 18px; color: #39FF14; }
+
+        video { width: 100%; max-height: 70vh; border: 1px solid #39FF14; }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen" class="container">
+    <h2>[ ACCESS ]</h2>
+    <input type="text" id="serverIP" placeholder="Server IP Address" />
+    <button id="connectBtn" onclick="connectToServer()">Connect</button>
+    <div id="loginError"></div>
+</div>
+
+<div id="chatScreen" class="container" style="display: none;">
+    <div class="tabs">
+        <button id="chatTabBtn" class="active" onclick="showView('chat')">Terminal</button>
+        <button id="driveTabBtn" onclick="showView('drive')">Vault (<span id="fileCount">0</span>)</button>
+    </div>
+
+    <span id="myIDLabel">IDENTITY: NULL</span>
+
+    <!-- CHAT VIEW -->
+    <div id="chatView">
+        <input type="text" id="targetID" placeholder="Target Anon-ID..." style="margin-bottom: 12px; height: 45px; font-size: 16px;" />
+        <div id="chatBox"></div>
+        <div id="fileProgress"><div id="progressBar"></div></div>
+        <div style="display: flex; gap: 10px;">
+            <input type="file" id="fileInput" style="display: none;" onchange="uploadFile()" />
+            <button onclick="document.getElementById('fileInput').click()" style="margin: 0; width: 55px; border-style: dashed;">📎</button>
+            <input type="text" id="messageInput" placeholder="Packet..." style="margin: 0;" />
+            <button onclick="sendMessage()" style="margin: 0; width: 90px;">EXE</button>
+        </div>
+    </div>
+
+    <!-- DRIVE VIEW -->
+    <div id="driveView" style="display: none;">
+        <div id="fileList">
+            <div style="text-align: center; color: #1a440a; margin-top: 50px; font-weight: bold;">Vault Empty.</div>
+        </div>
+    </div>
+</div>
+
+<div id="viewerOverlay">
+    <div id="viewerContent"></div>
+    <button id="viewerClose" onclick="closeViewer()">CLOSE</button>
+</div>
+
+<script>
+    let ws;
+    let myID = "";
+    let keyPair = null;
+    let targetPubKeys = {};
+    let keyRequests = {};
+    let serverIP = "";
+    let ghostDriveFiles = {};
+    let activeBlobUrl = null;
+
+    function showView(view) {
+        document.getElementById('chatView').style.display = view === 'chat' ? 'block' : 'none';
+        document.getElementById('driveView').style.display = view === 'drive' ? 'block' : 'none';
+        document.getElementById('chatTabBtn').className = view === 'chat' ? 'active' : '';
+        document.getElementById('driveTabBtn').className = view === 'drive' ? 'active' : '';
+    }
+
+    async function connectToServer() {
+        let ip = document.getElementById("serverIP").value.trim();
+        let errorBox = document.getElementById("loginError");
+        let btn = document.getElementById("connectBtn");
+        if (!ip) return;
+        serverIP = ip;
+        btn.disabled = true;
+        btn.innerText = "WAIT...";
+        try {
+            await initCrypto(ip);
+        } catch (e) {
+            errorBox.innerText = "DENIED: " + e.message;
+            btn.disabled = false;
+            btn.innerText = "Connect";
+        }
+    }
+
+    async function initCrypto(ip) {
+        keyPair = await window.crypto.subtle.generateKey(
+            { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey", "deriveBits"]
+        );
+        let pubKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+        ws = new WebSocket(`ws://${ip}:8000/ws`);
+        ws.onopen = () => {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("chatScreen").style.display = "block";
+            ws.send(JSON.stringify({ type: "register", pubKey: pubKey }));
+        };
+        ws.onmessage = handleIncomingMessage;
+        ws.onerror = () => alert("TERMINATED");
+    }
+
+    async function deriveAESKey(targetPubJWK) {
+        let targetPubKeyObj = await window.crypto.subtle.importKey(
+            "jwk", targetPubJWK, { name: "ECDH", namedCurve: "P-256" }, true, []
+        );
+        return await window.crypto.subtle.deriveKey(
+            { name: "ECDH", public: targetPubKeyObj }, keyPair.privateKey,
+            { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+        );
+    }
+
+    async function handleIncomingMessage(event) {
+        let data = JSON.parse(event.data);
+        if (data.type === "init") {
+            myID = data.id;
+            document.getElementById("myIDLabel").innerText = "ID: " + myID;
+        } else if (data.type === "pub_key") {
+            if (keyRequests[data.target_id]) { keyRequests[data.target_id](data.pubKey); delete keyRequests[data.target_id]; }
+        } else if (data.type === "message") {
+            try {
+                let sharedKey = await deriveAESKey(data.sender_pubKey);
+                let iv = base64ToArrayBuffer(data.iv);
+                if (data.drive_data) {
+                    let decryptedDrive = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, sharedKey, base64ToArrayBuffer(data.drive_data));
+                    let info = JSON.parse(new TextDecoder().decode(decryptedDrive));
+                    addFileToDrive(info, data.sender_id);
+                    displayMessage(data.sender_id, `>>> [PAYLOAD RECEIVED]`, "them");
+                } else {
+                    let decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, sharedKey, base64ToArrayBuffer(data.payload));
+                    displayMessage(data.sender_id, new TextDecoder().decode(decrypted), "them");
+                }
+            } catch (e) { console.error(e); }
+        }
+    }
+
+    function addFileToDrive(info, sender) {
+        ghostDriveFiles[info.file_id] = info;
+        const list = document.getElementById("fileList");
+        if (Object.keys(ghostDriveFiles).length === 1) list.innerHTML = "";
+
+        const item = document.createElement("div");
+        item.className = "file-item";
+        item.innerHTML = `
+            <div class="file-info">
+                <div class="file-name">OBJECT_${info.file_id.substring(0,8)}</div>
+                <div class="file-meta">FROM: ${sender} | TYPE: ${info.type}</div>
+            </div>
+            <div class="file-action">
+                <button onclick="openGhostFile('${info.file_id}')">OPEN</button>
+            </div>
+        `;
+        list.prepend(item);
+        document.getElementById("fileCount").innerText = Object.keys(ghostDriveFiles).length;
+    }
+
+    async function sendMessage() {
+        let target = document.getElementById("targetID").value.trim();
+        let msg = document.getElementById("messageInput").value.trim();
+        if (!target || !msg) return;
+        if (!targetPubKeys[target]) {
+            ws.send(JSON.stringify({ type: "get_key", target_id: target }));
+            targetPubKeys[target] = await new Promise(r => { keyRequests[target] = r; });
+        }
+        let sharedKey = await deriveAESKey(targetPubKeys[target]);
+        let iv = window.crypto.getRandomValues(new Uint8Array(12));
+        let cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, sharedKey, new TextEncoder().encode(msg));
+        ws.send(JSON.stringify({ type: "message", target_id: target, payload: arrayBufferToBase64(cipher), iv: arrayBufferToBase64(iv) }));
+        displayMessage("You", msg, "me");
+        document.getElementById("messageInput").value = "";
+    }
+
+    async function uploadFile() {
+        const file = document.getElementById('fileInput').files[0];
+        const target = document.getElementById("targetID").value.trim();
+        if (!file || !target) return;
+        document.getElementById("fileProgress").style.display = "block";
+        document.getElementById("progressBar").style.width = "20%";
+        try {
+            const fKey = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, fKey, await file.arrayBuffer());
+            const formData = new FormData();
+            formData.append("file", new Blob([iv, cipher]));
+            document.getElementById("progressBar").style.width = "60%";
+            const resp = await fetch(`http://${serverIP}:8000/upload/${myID}`, { method: 'POST', body: formData });
+            const { file_id } = await resp.json();
+            if (!targetPubKeys[target]) {
+                ws.send(JSON.stringify({ type: "get_key", target_id: target }));
+                targetPubKeys[target] = await new Promise(r => { keyRequests[target] = r; });
+            }
+            let sharedKey = await deriveAESKey(targetPubKeys[target]);
+            let dIv = window.crypto.getRandomValues(new Uint8Array(12));
+            let dData = JSON.stringify({ file_id, key: await window.crypto.subtle.exportKey("jwk", fKey), name: file.name, type: file.type });
+            let dCipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: dIv }, sharedKey, new TextEncoder().encode(dData));
+            ws.send(JSON.stringify({ type: "message", target_id: target, iv: arrayBufferToBase64(dIv), drive_data: arrayBufferToBase64(dCipher) }));
+            document.getElementById("progressBar").style.width = "100%";
+            setTimeout(() => document.getElementById("fileProgress").style.display = "none", 1000);
+            displayMessage("You", `>>> [PAYLOAD SENT]`, "me");
+        } catch (e) { alert("ERROR"); }
+    }
+
+    async function openGhostFile(id) {
+        const info = ghostDriveFiles[id];
+        try {
+            const resp = await fetch(`http://${serverIP}:8000/download/${id}`);
+            const data = await resp.arrayBuffer();
+            const fKey = await window.crypto.subtle.importKey("jwk", info.key, { name: "AES-GCM" }, true, ["decrypt"]);
+            const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: new Uint8Array(data.slice(0, 12)) }, fKey, data.slice(12));
+
+            const overlay = document.getElementById("viewerOverlay");
+            const content = document.getElementById("viewerContent");
+            content.innerHTML = "";
+
+            if (info.type.startsWith("image/")) {
+                const url = URL.createObjectURL(new Blob([decrypted], { type: info.type }));
+                activeBlobUrl = url;
+                content.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 80vh; border: 2px solid #39FF14;">`;
+            } else if (info.type.startsWith("video/")) {
+                const url = URL.createObjectURL(new Blob([decrypted], { type: info.type }));
+                activeBlobUrl = url;
+                content.innerHTML = `<video controls autoplay><source src="${url}" type="${info.type}">Your browser does not support video.</video>`;
+            } else {
+                const text = new TextDecoder().decode(decrypted);
+                content.innerHTML = `<pre style="white-space: pre-wrap; word-break: break-all; font-size: 16px; width: 100%; color: #FFFFFF;">${text}</pre>`;
+            }
+            overlay.style.display = "flex";
+        } catch (e) { alert("PURGED"); }
+    }
+
+    function closeViewer() {
+        document.getElementById("viewerOverlay").style.display = "none";
+        document.getElementById("viewerContent").innerHTML = "";
+        if (activeBlobUrl) {
+            URL.revokeObjectURL(activeBlobUrl);
+            activeBlobUrl = null;
+        }
+    }
+
+    function arrayBufferToBase64(b) {
+        let s = ''; let u = new Uint8Array(b);
+        for (let i = 0; i < u.byteLength; i++) s += String.fromCharCode(u[i]);
+        return window.btoa(s);
+    }
+    function base64ToArrayBuffer(s) {
+        let b = window.atob(s); let u = new Uint8Array(b.length);
+        for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+        return u.buffer;
+    }
+    function displayMessage(s, t, y) {
+        let b = document.getElementById("chatBox");
+        b.innerHTML += `<div class="msg ${y}"><strong>${s}:</strong> ${t}</div>`;
+        b.scrollTop = b.scrollHeight;
+    }
+</script>
+</body>
+</html>

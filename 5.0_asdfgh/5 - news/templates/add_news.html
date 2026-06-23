@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Edit Portal | Add News</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Article</h1>
+        <form method="POST" class="news-form">
+            <input type="text" name="title" placeholder="Article Title" required>
+            <input type="text" name="category" placeholder="Category (e.g., Tech, World)" required>
+            <textarea name="content" placeholder="Write your news here..." rows="10" required></textarea>
+            <button type="submit" class="btn">Publish News</button>
+            <a href="/" class="btn-cancel">Back to Home</a>
+        </form>
+    </div>
+</body>
+</html>

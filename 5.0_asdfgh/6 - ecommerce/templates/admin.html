@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body>
+    <nav class="navbar"><h1>Admin Panel</h1> <a href="/">ShopStore</a></nav>
+    <div class="cart-container">
+        <a href="/admin/add" class="btn-cart">Add New Product</a>
+        <table class="cart-table">
+            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Process</th></tr></thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>${{ item.price }}</td>
+                    {% if session.get('is_admin') %}
+                    <td><a href="{{ url_for('delete_product', id=item.id) }}" style="color:red;" >Delete</a></td>
+                {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

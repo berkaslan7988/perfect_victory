@@ -1,0 +1,2 @@
+{"role": "user", "content": "?"}
+{"role": "assistant", "content": "", "tool_calls": [{"id": "z81hjpthz", "type": "function", "function": {"name": "list_files", "arguments": "null"}}]}

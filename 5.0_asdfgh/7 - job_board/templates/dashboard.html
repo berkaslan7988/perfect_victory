@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Employer Dashboard - JobBoard</title>
+</head>
+<body style="background-color: #f4f6f9; margin: 0; font-family: Arial, sans-serif;">
+
+    <nav class="navbar" style="background:#232f3e; padding: 15px 30px; display:flex; justify-content:space-between; align-items:center; color:white;">
+        <h2 style="margin:0;"><a href="/" style="color:white; text-decoration:none;">JobBoard Dashboard</a></h2>
+        <div>
+            <a href="/" style="color:white; text-decoration:none; margin-right:20px;">Find Jobs</a>
+            <a href="/post-job" style="color:#ff9900; text-decoration:none; font-weight:bold;">+ Post a Job</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #232f3e;">Incoming Applications</h2>
+        <p style="color: #666; margin-bottom: 20px;">Review candidates who applied to your open positions and download their CVs.</p>
+
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="background-color: #232f3e; color: white;">
+                    <th style="padding: 12px;">Job Title</th>
+                    <th style="padding: 12px;">Applicant Name</th>
+                    <th style="padding: 12px;">CV Document</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 12px; font-weight: bold; color: #232f3e;">{{ app.job_title }}</td>
+                    <td style="padding: 12px;">{{ app.seeker_name }}</td>
+                    <td style="padding: 12px;">
+                        {% if app.cv_filename %}
+                            <a href="{{ url_for('static', filename='uploads/cvs/' + app.cv_filename) }}" target="_blank" style="color: #ff9900; font-weight: bold; text-decoration: none;">📄 Download CV</a>
+                        {% else %}
+                            <span style="color: #999; font-style: italic;">No CV uploaded</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="padding: 30px; text-align: center; color: #999;">No applications received yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

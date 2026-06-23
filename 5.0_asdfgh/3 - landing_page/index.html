@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetOps Suite | Ultimate Security Diagnostics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">NetOps</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#waitlist" class="btn btn-outline">Join Waitlist</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Diagnose. Detect. <span class="highlight">Defend.</span></h1>
+            <p>The ultimate desktop security suite for network administrators and penetration testers. Powerful Python backend meets a sleek WPF interface.</p>
+            <a href="#waitlist" class="btn btn-primary">Get Early Access</a>
+            <p class="small-text">No credit card required. Windows 10/11 only.</p>
+        </div>
+    </header>
+
+    <section class="features" id="features">
+        <h2>Everything You Need in One Toolkit</h2>
+        <div class="feature-grid">
+            <div class="feature-box">
+                <div class="icon">📡</div>
+                <h3>Packet Sniffer</h3>
+                <p>Monitor live network traffic, capture raw sockets, and analyze data flows in real-time without external dependencies.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">⚙️</div>
+                <h3>Live Process Monitor</h3>
+                <p>Scan your OS kernel for active processes, track memory usage, and spot malicious hidden background tasks instantly.</p>
+            </div>
+            <div class="feature-box">
+                <div class="icon">🔍</div>
+                <h3>Web Path Auditor</h3>
+                <p>Brute-force hidden directories and files on target web servers to discover exposed admin panels and backups.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="lead-gen" id="waitlist">
+        <div class="form-container">
+            <h2>Ready to Upgrade Your Toolkit?</h2>
+            <p>We are currently in closed beta. Enter your email to join the waitlist and get a 50% discount on launch day.</p>
+            
+            <form id="waitlistForm">
+    <div class="input-group">
+        <input type="text" id="userName" placeholder="Full Name" required>
+    </div>
+    <div class="input-group">
+        <input type="email" id="userEmail" placeholder="Work Email Address" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Secure My Spot</button>
+</form>
+<p class="privacy-note" id="statusMessage">We respect your privacy. No spam, ever.</p>
+
+<script>
+    document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Sayfanın yenilenmesini engelle
+        
+        const nameData = document.getElementById('userName').value;
+        const emailData = document.getElementById('userEmail').value;
+        const statusMsg = document.getElementById('statusMessage');
+
+        statusMsg.innerText = "Sending data...";
+        statusMsg.style.color = "#6c5ce7";
+
+        // Python Backend'ine (API) veriyi JSON formatında yolluyoruz
+        fetch('http://127.0.0.1:5000/api/join', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: nameData, email: emailData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            statusMsg.innerText = data.message;
+            statusMsg.style.color = data.status === 'success' ? "#00ffcc" : "red";
+            if(data.status === 'success') document.getElementById('waitlistForm').reset();
+        })
+        .catch(error => {
+            statusMsg.innerText = "Error connecting to server.";
+            statusMsg.style.color = "red";
+        });
+    });
+</script>
+            <p class="privacy-note">We respect your privacy. No spam, ever.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 NetOps Security Software. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

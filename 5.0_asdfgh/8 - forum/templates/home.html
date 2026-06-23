@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Community Forum</title>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="brand">💬 DevForum</a>
+        <div>
+            {% if 'user_id' in session %}
+                <span style="color: #fff; margin-right: 10px;">👋 Hello, <strong>{{ session['username'] }}</strong></span>
+                <a href="/logout" style="color: #ffc107;">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="main-content">
+            <h2 class="section-title">Forum Categories</h2>
+            
+            {% for cat in categories %}
+            <div class="category-card">
+                <h3><a href="/category/{{ cat.id }}">{{ cat.name }}</a></h3>
+                <p style="color: #666; margin: 5px 0 0 0;">{{ cat.description }}</p>
+            </div>
+            {% else %}
+            <p>No categories found.</p>
+            {% endfor %}
+        </div>
+
+        <div class="sidebar">
+            <h2 class="section-title" style="font-size: 1.1rem;">Latest Discussions</h2>
+            
+            {% for thread in threads %}
+            <div class="thread-item">
+                <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
+                <div class="thread-meta">
+                    by <span>@{{ thread.username }}</span> in <span class="badge">{{ thread.category_name }}</span>
+                </div>
+            </div>
+            {% else %}
+            <p style="color: #999; font-size: 0.9rem;">No recent posts.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</body>
+</html>

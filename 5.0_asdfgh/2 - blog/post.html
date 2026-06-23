@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse Engineering a Suspicious PDF | Cyber Insights</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="blog-header">
+        <div class="logo">Cyber Insights</div>
+        <nav>
+            <a href="index.html">← Back to Home</a>
+        </nav>
+    </header>
+
+    <main class="container article-container">
+        
+        <header class="article-header">
+            <span class="category-tag">Malware Analysis</span>
+            <h1>Reverse Engineering a Suspicious PDF File</h1>
+            <p class="post-meta">Published on May 24, 2026 • Written by NetOps Admin</p>
+        </header>
+
+        <article class="article-body">
+            <p>PDF files are ubiquitous in corporate environments, making them a prime target for threat actors. In this post, we will dissect a malicious PDF that uses embedded JavaScript to execute a payload.</p>
+            
+            <h2>1. The Initial Assessment</h2>
+            <p>First, we never open a suspicious file on a host machine. We move it to an isolated sandbox environment. Using a tool like <code>pdfid</code>, we scan for embedded elements.</p>
+            
+            <div class="code-block">
+                <pre><code>$ pdfid suspicious_invoice.pdf
+ PDF Header: %PDF-1.4
+ obj           : 15
+ endobj        : 15
+ stream        : 4
+ endstream     : 4
+ /JS           : 2
+ /JavaScript   : 2</code></pre>
+            </div>
+
+            <h2>2. Extracting the Payload</h2>
+            <p>The presence of `/JS` and `/JavaScript` tags indicates active content. We can use <code>pdf-parser</code> to extract the raw script block for further static analysis...</p>
+        </article>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Cyber Insights. Stay Secure.</p>
+    </footer>
+
+</body>
+</html>

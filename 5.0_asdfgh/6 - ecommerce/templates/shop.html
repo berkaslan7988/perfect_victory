@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body>
+    <nav class="navbar" style="background:#232f3e; padding: 20px; display:flex; justify-content:space-between; color:white;">
+    <h2>ShopStore</h2>
+    <div class="navbar-links">
+        <a href="/">Home</a>
+        <a href="{{ url_for('cart') }}">My Cart</a>
+        {% if 'user_id' in session %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </div>
+</nav>
+    <h1>Store</h1>
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="card">
+                <h3>{{ product.name }}</h3>
+                <p>${{ product.price }}</p>
+                <a href="{{ url_for('add_to_cart', id=product.id) }}" class="btn">Add to Cart</a>
+            </div>
+        {% endfor %}
+    </div>
+    <a href="/cart">View Cart</a>
+</body>
+</html>

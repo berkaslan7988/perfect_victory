@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body>
+    <div class="container">
+        <h1>Add New Product</h1>
+        <form method="POST" class="news-form">
+            <input type="text" name="name" placeholder="Product Name" required>
+            <input type="number" step="0.01" name="price" placeholder="Price" required>
+            <input type="text" name="category" placeholder="Category" required>
+            <textarea name="description" placeholder="Description"></textarea>
+            <button type="submit" class="btn">Add Product</button>
+        </form>
+    </div>
+</body>
+</html>

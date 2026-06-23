@@ -51,6 +51,7 @@ screen and auto-notifies the agent when errors/exceptions appear.
 cd ZeusAI
 cp .env.example .env          # add your own API keys
 pip install -r requirements.txt   # (litellm, fastapi, uvicorn, chromadb, ...)
+playwright install            # tarayıcı binary'lerini indirir, tools.py içinde Playwright kullanılıyor
 uvicorn backend.server:app --host 0.0.0.0 --port 8000 --reload
 
 # 2. Frontend (separate terminal)

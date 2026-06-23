@@ -23,7 +23,15 @@ export default function App() {
     clearMessages,
   } = useWebSocket()
 
-  const appWindow = getCurrentWindow()
+  // Tauri masaüstü API'si sadece Tauri penceresi içinde mevcuttur.
+  // Normal tarayıcıda (npm run dev) bu çağrı hata fırlatıp tüm
+  // uygulamayı çökertir (boş ekran). Bu yüzden koruma altına alıyoruz.
+  let appWindow = null
+  try {
+    appWindow = getCurrentWindow()
+  } catch (e) {
+    appWindow = null
+  }
 
   // ---- Active Tab ----
   const [activeTab, setActiveTab] = useState('chat')
@@ -190,9 +198,9 @@ export default function App() {
   // ==========================================
   // TITLE BAR BUTONLARI (FAZ 10)
   // ==========================================
-  const handleMinimize = () => appWindow.minimize()
-  const handleMaximize = () => appWindow.toggleMaximize()
-  const handleClose = () => appWindow.close()
+  const handleMinimize = () => appWindow?.minimize()
+  const handleMaximize = () => appWindow?.toggleMaximize()
+  const handleClose = () => appWindow?.close()
 
   // ==========================================
   // RENDER RIGHT PANEL

@@ -1,0 +1,49 @@
+# --- Web server / orchestrator ---
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+httpx
+websockets
+
+# --- LLM routing ---
+litellm
+tenacity
+tiktoken
+
+# --- Memory / vector store ---
+chromadb
+
+# --- Docker sandbox & git ---
+docker
+GitPython
+
+# --- Browser automation (Researcher agent) ---
+playwright
+
+# --- Desktop control / screen monitoring ---
+pyautogui
+mss
+pillow
+pytesseract
+numpy
+psutil
+
+# --- Voice (STT/TTS) ---
+openai-whisper
+gtts
+sounddevice
+scipy
+elevenlabs
+
+# --- Search ---
+tavily-python
+
+# --- Optional LLM provider SDK used directly in some modules ---
+google-generativeai
+
+# --- Secure key storage (.env -> OS keychain fallback) ---
+keyring
+
+# --- (Optional) Streamlit debug/preview UI, if used ---
+streamlit

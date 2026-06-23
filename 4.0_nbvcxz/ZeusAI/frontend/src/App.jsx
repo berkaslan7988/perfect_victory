@@ -10,7 +10,6 @@ import {
   VscChromeMinimize, VscChromeMaximize, VscChromeClose,
   VscSearch, VscColorMode, VscSymbolRuler,
 } from 'react-icons/vsc'
-
 /* ============================================================
    ZEUSAI — ROOT APPLICATION COMPONENT (FAZ 10: Premium UI)
    Özel title bar, Cmd+K komut paleti, thinking timeline, tema

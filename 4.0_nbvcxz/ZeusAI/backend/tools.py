@@ -1,5 +1,5 @@
 """
-Antigravity Faz 5+6 — Araç (Tool) Katmanı
+ZeusAI Faz 5+6 — Araç (Tool) Katmanı
 ============================================
 Tüm araç tanımları (TOOLS), async executor fonksiyonları ve
 TOOL_EXECUTORS sözlüğü burada yaşar.

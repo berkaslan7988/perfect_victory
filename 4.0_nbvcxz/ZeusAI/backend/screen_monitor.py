@@ -1,5 +1,5 @@
 """
-Antigravity Faz 6 — Sürekli Ekran İzleme (Screen Monitor)
+ZeusAI Faz 6 — Sürekli Ekran İzleme (Screen Monitor)
 ============================================================
 Event-driven screen watcher. Arka planda periyodik olarak ekran
 görüntüsü alır, OCR ile metin çıkarır. Tetikleyici kelimeler

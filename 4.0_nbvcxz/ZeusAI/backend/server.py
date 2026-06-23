@@ -1,5 +1,5 @@
 """
-Antigravity Faz 7+8 — FastAPI WebSocket Orchestrator
+ZeusAI Faz 7+8 — FastAPI WebSocket Orchestrator
 ======================================================
 Sınırsız bağlam motoru, döngü tespiti, tenacity retry,
 DeepSeek bulut + otomatik yedek zinciri, token/maliyet sayacı.
@@ -44,7 +44,7 @@ from backend.memory import (
 # ==========================================
 # FASTAPI UYGULAMASI
 # ==========================================
-app = FastAPI(title="Antigravity Agent API", version="5.1.0")
+app = FastAPI(title="ZeusAI Agent API", version="5.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -87,7 +87,7 @@ sessions: dict[str, AgentSession] = {}  # ws_id -> session
 # ==========================================
 # SYSTEM PROMPT
 # ==========================================
-SYSTEM_PROMPT = """Sen ZeusAI / Antigravity adında, otonom ve ileri düzey bir yazılım mühendisi ajanısın.
+SYSTEM_PROMPT = """Sen ZeusAI adında, otonom ve ileri düzey bir yazılım mühendisi ajanısın.
 
 ADIM ADIM DÜŞÜNCE SÜRECİN (ReAct):
 1. ANALİZ: Görevi anla. Risk var mı? Hangi araç(lar) gerekli?
@@ -652,7 +652,7 @@ async def api_checkpoints():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "antigravity-agent"}
+    return {"status": "ok", "service": "zeusai-agent"}
 
 
 if __name__ == "__main__":

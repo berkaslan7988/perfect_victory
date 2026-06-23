@@ -100,9 +100,9 @@ os.makedirs(CHROMA_DB_PATH, exist_ok=True)
 try:
     chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
     try:
-        memory_collection = chroma_client.get_collection(name="antigravity_memory")
+        memory_collection = chroma_client.get_collection(name="zeus_memory")
     except Exception:
-        memory_collection = chroma_client.create_collection(name="antigravity_memory")
+        memory_collection = chroma_client.create_collection(name="zeus_memory")
     MEMORY_AVAILABLE = True
 except Exception:
     MEMORY_AVAILABLE = False
@@ -124,7 +124,7 @@ def search_memory(query: str, n_results: int = 2) -> list:
 # ==========================================
 # 2b. SQLİTE EPİSODİK LOG (FAZ 4)
 # ==========================================
-EPISODES_DB = "./antigravity_episodes.db"
+EPISODES_DB = "./zeus_episodes.db"
 
 def _init_episodes_db() -> bool:
     try:
@@ -317,7 +317,7 @@ _PLUGIN_EXECUTORS   = {td["function"]["name"]: ex for td, ex in _PLUGIN_ENTRIES}
 # 3. GÜVENLİ API KEY YÖNETİMİ (FAZ 1)
 # Öncelik: .env / ortam değişkeni > OS Keychain > sidebar manuel giriş
 # ==========================================
-KEYRING_SERVICE = "antigravity"
+KEYRING_SERVICE = "zeusai"
 
 def get_key(service: str) -> str:
     env_val = os.getenv(f"{service.upper()}_API_KEY")
@@ -343,7 +343,7 @@ def save_key(service: str, key: str):
 # ==========================================
 # SAYFA AYARLARI & CSS
 # ==========================================
-st.set_page_config(page_title="Project Antigravity", page_icon="🚀", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Zeus AI", page_icon="🚀", layout="wide", initial_sidebar_state="expanded")
 st.markdown("""
 <style>
     .stApp { background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #000000 100%); background-attachment: fixed; }
@@ -362,13 +362,13 @@ def icon(name, color="#67E8F9", size="20px"):
 # SESSION STATE & WORKSPACE
 # ==========================================
 if "messages" not in st.session_state: st.session_state.messages = []
-if "logs" not in st.session_state: st.session_state.logs = [("[SYS]", "Antigravity Core initialized.")]
+if "logs" not in st.session_state: st.session_state.logs = [("[SYS]", "ZeusAI Core initialized.")]
 if "active_tool" not in st.session_state: st.session_state.active_tool = "None (Idle)"
 if "fail_count" not in st.session_state: st.session_state.fail_count = 0
 if "project_path" not in st.session_state: st.session_state.project_path = ""
 if "project_context" not in st.session_state: st.session_state.project_context = ""
 
-WORKSPACE_DIR = os.path.abspath("./antigravity_workspace")
+WORKSPACE_DIR = os.path.abspath("./zeus_workspace")
 os.makedirs(WORKSPACE_DIR, exist_ok=True)
 
 def add_log(level, msg):
@@ -892,7 +892,7 @@ TOOL_EXECUTORS = {
 # 1. SOL PANEL (Sidebar)
 # ==========================================
 with st.sidebar:
-    st.markdown(f'<h1>{icon("auto_awesome", "#67E8F9", "28px")} Antigravity</h1>', unsafe_allow_html=True)
+    st.markdown(f'<h1>{icon("auto_awesome", "#67E8F9", "28px")} Zeus AI</h1>', unsafe_allow_html=True)
     st.markdown("---")
     st.markdown("### 🔑 API Keys")
     st.caption("Anahtarlar önce .env, sonra OS Keychain'den okunur. Buraya girersen otomatik Keychain'e kaydedilir.")
@@ -1001,7 +1001,7 @@ with col_chat:
             add_log("sys", f"[USER] {prompt[:50]}...")
 
             try:
-                system_prompt = """Sen Antigravity adında, otonom ve ileri düzey bir yazılım mühendisi ajanısın.
+                system_prompt = """Sen ZeusAI adında, otonom ve ileri düzey bir yazılım mühendisi ajanısın.
 
 ADIM ADIM DÜŞÜNCE SÜRECİN (ReAct):
 1. ANALİZ: Görevi anla. Risk var mı? Hangi araç(lar) gerekli?

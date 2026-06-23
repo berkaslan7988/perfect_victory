@@ -1,5 +1,5 @@
 """
-Antigravity Faz 7 — Sınırsız Bağlam & Hafıza Sistemi
+ZeusAI Faz 7 — Sınırsız Bağlam & Hafıza Sistemi
 ========================================================
 - ChromaDB semantik bellek (vektör arama)
 - SQLite episodik log (görev geçmişi)
@@ -36,9 +36,9 @@ try:
     import chromadb
     _chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
     try:
-        _memory_collection = _chroma_client.get_collection(name="antigravity_memory")
+        _memory_collection = _chroma_client.get_collection(name="zeus_memory")
     except Exception:
-        _memory_collection = _chroma_client.create_collection(name="antigravity_memory")
+        _memory_collection = _chroma_client.create_collection(name="zeus_memory")
     MEMORY_AVAILABLE = True
 except Exception as e:
     print(f"[BELLEK] ChromaDB başlatılamadı: {e}")

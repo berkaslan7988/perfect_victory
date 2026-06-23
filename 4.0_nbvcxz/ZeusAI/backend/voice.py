@@ -1,5 +1,5 @@
 """
-Antigravity Faz 6 — Ses Arayüzü (Voice Interface)
+ZeusAI Faz 6 — Ses Arayüzü (Voice Interface)
 ====================================================
 Whisper ile Speech-to-Text (konuşmayı metne çevir)
 gTTS / ElevenLabs ile Text-to-Speech (metni sese çevir)
@@ -173,7 +173,7 @@ async def _speak_gtts(text: str, lang: str = "tr") -> dict:
     def _generate_and_play():
         tts = gTTS(text=text[:500], lang=lang, slow=False)
         # Geçici dosyaya kaydet
-        tmp_path = os.path.join(tempfile.gettempdir(), f"antigravity_tts_{os.getpid()}.mp3")
+        tmp_path = os.path.join(tempfile.gettempdir(), f"zeusai_tts_{os.getpid()}.mp3")
         tts.save(tmp_path)
         return tmp_path
 
@@ -225,7 +225,7 @@ async def _speak_elevenlabs(text: str, lang: str = "tr") -> dict:
             voice="Rachel",  # Varsayılan ses
             model="eleven_multilingual_v2",
         )
-        tmp_path = os.path.join(tempfile.gettempdir(), f"antigravity_tts_{os.getpid()}.mp3")
+        tmp_path = os.path.join(tempfile.gettempdir(), f"zeusai_tts_{os.getpid()}.mp3")
         with open(tmp_path, "wb") as f:
             f.write(audio)
         return tmp_path

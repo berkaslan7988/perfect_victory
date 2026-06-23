@@ -1,5 +1,5 @@
 """
-Antigravity Faz 7+8 — Yapılandırma, API Key Yönetimi & Model Hub
+ZeusAI Faz 7+8 — Yapılandırma, API Key Yönetimi & Model Hub
 ====================================================================
 .env / ortam değişkeni > OS Keychain > çalışma-zamanı bellek sırasıyla
 API anahtarlarını çözer. Derin model seçici, otomatik yedek zinciri,
@@ -17,24 +17,24 @@ load_dotenv()
 # ==========================================
 # SABİTLER
 # ==========================================
-KEYRING_SERVICE = "antigravity"
+KEYRING_SERVICE = "zeusai"
 WORKSPACE_DIR = os.path.abspath(
-    os.environ.get("ANTIGRAVITY_WORKSPACE", os.path.join(os.path.dirname(os.path.dirname(__file__)), "antigravity_workspace"))
+    os.environ.get("ZEUS_WORKSPACE", os.path.join(os.path.dirname(os.path.dirname(__file__)), "zeus_workspace"))
 )
 os.makedirs(WORKSPACE_DIR, exist_ok=True)
 
 PLUGINS_DIR = os.path.abspath(
-    os.environ.get("ANTIGRAVITY_PLUGINS", os.path.join(os.path.dirname(os.path.dirname(__file__)), "plugins"))
+    os.environ.get("ZEUS_PLUGINS", os.path.join(os.path.dirname(os.path.dirname(__file__)), "plugins"))
 )
 os.makedirs(PLUGINS_DIR, exist_ok=True)
 
 CHROMA_DB_PATH = os.path.abspath(
-    os.environ.get("ANTIGRAVITY_CHROMA_DB", os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db"))
+    os.environ.get("ZEUS_CHROMA_DB", os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db"))
 )
 os.makedirs(CHROMA_DB_PATH, exist_ok=True)
 
 EPISODES_DB = os.path.abspath(
-    os.environ.get("ANTIGRAVITY_EPISODES_DB", os.path.join(os.path.dirname(os.path.dirname(__file__)), "antigravity_episodes.db"))
+    os.environ.get("ZEUS_EPISODES_DB", os.path.join(os.path.dirname(os.path.dirname(__file__)), "zeus_episodes.db"))
 )
 
 SANDBOX_IMAGE = "python:3.11-slim"

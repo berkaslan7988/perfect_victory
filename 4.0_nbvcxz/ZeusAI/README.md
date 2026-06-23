@@ -1,6 +1,6 @@
 # Zeus AI — Autonomous Multi-Agent Coding Assistant
 
-Zeus AI (internal codename *Antigravity*) is an autonomous coding agent that
+Zeus AI is an autonomous coding agent that
 plans, writes, runs, and validates software on its own. Instead of a single LLM
 loop, it splits work across **four specialized agents** that coordinate through an
 async orchestrator.

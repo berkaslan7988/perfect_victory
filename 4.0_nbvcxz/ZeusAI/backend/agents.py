@@ -1,5 +1,5 @@
 """
-Antigravity Faz 11 — Multi-Agent Orkestrasyonu
+ZeusAI Faz 11 — Multi-Agent Orkestrasyonu
 =================================================
 Gerçek ayrı ajan sınıfları: Planner, Coder, Researcher, Validator.
 Her birinin kendi system promptu, araç alt-kümesi ve modeli var.
